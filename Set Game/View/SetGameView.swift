@@ -13,9 +13,7 @@ struct SetGameView: View {
     var body: some View {
         VStack {
             HStack{
-                
                 Spacer()
-                
                 Button(action: {
                     withAnimation(.easeInOut(duration: 1)) {
                         self.setGameViewModel.newGame()
@@ -23,9 +21,9 @@ struct SetGameView: View {
                 }, label: {
                     Text("New game")
                 })
-                    .padding(.trailing, 5)
+                        .padding(.trailing, 5)
             }
-            
+
             HStack {
                 Text("Cards left: \(setGameViewModel.cards.count + setGameViewModel.activeCards.count)")
                     .font(.title)
@@ -35,23 +33,28 @@ struct SetGameView: View {
                 
                 Spacer()
             }
-            
-            
+
             Grid(setGameViewModel.activeCards){ card in
-                CardView(card: card)
-                .padding(5)
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 3)) {
-                        self.setGameViewModel.choose(card: card)
-                    }
-                    
-                }
-                .transition(.offset(x: self.offsetCoordinateOutsideScreen, y: self.offsetCoordinateOutsideScreen))
+                CardView(card: card, setGameViewModel: self.setGameViewModel)
+                        .padding(5)
+                        .onTapGesture {
+                            withAnimation(.easeInOut) {
+                                self.setGameViewModel.choose(card: card)
+                            }
+                        }
+                        .transition(
+                                .offset(
+                                        x: self.offsetCoordinateOutsideScreen,
+                                        y: self.offsetCoordinateOutsideScreen
+                                )
+                        )
+//                        .animation(.easeInOut(duration: 1))
             }
             
-            NavigatorView(setGameViewModel: setGameViewModel).foregroundColor(.blue)
+            NavigatorView(setGameViewModel: setGameViewModel)
+                    .foregroundColor(.blue)
         }
-            .padding()
+                .padding()
         
     }
     
@@ -62,6 +65,9 @@ struct SetGameView: View {
 
 struct CardView: View {
     var card: SetGame<SetGameViewModel.CardContent>.Card
+    @ObservedObject var setGameViewModel: SetGameViewModel
+//    @State var wrongAttempt = true
+
     var body: some View {
         
         Group {
@@ -75,10 +81,12 @@ struct CardView: View {
                 DiamondView(card: card)
             }
         }
-        .padding()
-        .cardify(thickness: card.isPartOfSet ? 10 : 3)
-        .padding(card.isSelected ? 8 : 0)
-        .foregroundColor(.blue)
+                .padding()
+                .rotationEffect(.degrees(card.isMatched ? 360 : 0))
+                .cardify(thickness: card.isPartOfSetFoundByAI ? 10 : 3)
+                .padding(card.isSelected ? 8 : 0)
+//                .offset(x: card.isPartOfSetFoundByAI ? -10 : 0).animation(Animation.default.repeatCount(5))
+                .foregroundColor(.blue)
     }
 }
 
@@ -87,29 +95,34 @@ struct NavigatorView: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
-            .stroke()
-            .frame(height: 80)
+                    .stroke()
+                    .frame(height: 80)
             HStack {
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 0.25)) {
+                    withAnimation(.easeInOut) {
                         self.setGameViewModel.noSet()
                     }
                 }, label: {
                     Text("No set")
                 })
+
                 Spacer()
+
                 Text("Score: \(setGameViewModel.score)").animation(.none)
+
                 Spacer()
+
                 Button(action: {
-                    withAnimation(.easeInOut(duration: 3)) {
+                    withAnimation(.easeInOut) {
                         self.setGameViewModel.help()
                     }
                 }, label: {
                     Text("Get help")
                 })
             }
-                .foregroundColor(.primary).font(.title)
-                .padding()
+                    .foregroundColor(.primary)
+                    .font(.title)
+                    .padding()
         }
     }
 }
@@ -150,8 +163,8 @@ struct RectangleView: View {
                     }
                 }
             }
-            .foregroundColor(self.card.data.color.view)
-            .frame(height: reader.size.height)
+                    .foregroundColor(self.card.data.color.view)
+                    .frame(height: reader.size.height)
         }
     }
 }
@@ -171,8 +184,8 @@ struct DiamondView: View {
                     }
                 }
             }
-            .foregroundColor(self.card.data.color.view)
-            .frame(height: reader.size.height)
+                    .foregroundColor(self.card.data.color.view)
+                    .frame(height: reader.size.height)
         }
     }
 }

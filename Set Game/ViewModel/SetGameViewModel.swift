@@ -26,6 +26,10 @@ class SetGameViewModel: ObservableObject {
     var score: Int {
         setGame.score
     }
+
+    var selectedCardsCount: Int {
+        setGame.indicesOfSelectedCards.count
+    }
     
     
     static func createSetGame() -> SetGame<CardContent> {
@@ -40,7 +44,14 @@ class SetGameViewModel: ObservableObject {
     //MARK: Intents
     
     func choose(card: SetGame<CardContent>.Card) {
-        setGame.choose(card)
+        if card.isSelected {
+            if selectedCardsCount != 3 || !card.isMatched {
+                setGame.deselect(card)
+            }
+        } else {
+            setGame.select(card)
+        }
+
     }
     
     func help() {

@@ -12,44 +12,35 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
     private(set) var cards: [Card]
     private(set) var activeCards: [Card]
     private(set) var score = 0
-    private(set) var indiciesOfFaceUpCards: [Int]
+    private(set) var indicesOfSelectedCards: [Int]
+    private(set) var previousMadeSet = false
     
-    private mutating func manageGame() {
-        if selectedMakeSet() {
-            indiciesOfFaceUpCards.sort()
-            for (_, elementIndex) in indiciesOfFaceUpCards.enumerated().reversed() {
-                if let e = cards.first {
-                    activeCards[elementIndex] = e
-                    cards.remove(at: 0)
-                } else {
-                    activeCards.remove(at: elementIndex)
-                }
-                
-            }
-            score += 20
-        }
-        
-        for i in 0..<activeCards.count {
-            activeCards[i].isSelected = false
-        }
-        
-        indiciesOfFaceUpCards = []
-    }
-    
-    mutating func choose(_ card: Card) {
+    mutating func select(_ card: Card) {
 //        print(card)
         if let i = activeCards.firstIndex(matching: card) {
-            if activeCards[i].isSelected {
-                activeCards[i].isSelected = false
-                indiciesOfFaceUpCards.removeAll{$0 == i}
-            } else {
-                activeCards[i].isSelected = true
-                indiciesOfFaceUpCards.append(i)
+            activeCards[i].isSelected = true
+            indicesOfSelectedCards.append(i)
+
+            if indicesOfSelectedCards.count == 3 {
+                if selectedMakeSet() {
+                    previousMadeSet = true
+                    indicesOfSelectedCards.forEach { i in
+                        activeCards[i].isMatched = true
+                    }
+                    score += 20
+                } else {
+                    previousMadeSet = false
+                }
+            } else if indicesOfSelectedCards.count == 4 {
+                resetSelectedCards()
             }
-            
-            if indiciesOfFaceUpCards.count == 3 {
-                manageGame()
-            }
+        }
+    }
+
+    mutating func deselect(_ card: Card) {
+        if let i = activeCards.firstIndex(matching: card) {
+            activeCards[i].isSelected = false
+            indicesOfSelectedCards.removeAll{$0 == i}
         }
     }
     
@@ -85,9 +76,9 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
                         activeCards[i].isMatchingForSet(with: activeCards[k]) &&
                         activeCards[j].isMatchingForSet(with: activeCards[k]){
                         
-                        activeCards[i].isPartOfSet = true
-                        activeCards[j].isPartOfSet = true
-                        activeCards[k].isPartOfSet = true
+                        activeCards[i].isPartOfSetFoundByAI = true
+                        activeCards[j].isPartOfSetFoundByAI = true
+                        activeCards[k].isPartOfSetFoundByAI = true
                         
                         return
                     }
@@ -96,6 +87,29 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
         }
         
         noSetFound()
+    }
+
+    private mutating func resetSelectedCards() {
+        if previousMadeSet {
+            let lastIndex = indicesOfSelectedCards.popLast()!
+            activeCards[lastIndex].isSelected = false
+
+            indicesOfSelectedCards.sort()
+            for (_, elementIndex) in indicesOfSelectedCards.enumerated().reversed() {
+                if let e = cards.first {
+                    activeCards[elementIndex] = e
+                    cards.remove(at: 0)
+                } else {
+                    activeCards.remove(at: elementIndex)
+                }
+
+            }
+        } else {
+            for i in 0..<activeCards.count {
+                activeCards[i].isSelected = false
+            }
+        }
+        indicesOfSelectedCards = []
     }
     
     static func isSetPossible(with cards: [Card]) -> Bool {
@@ -121,11 +135,11 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
         var fill: Set<Int> = []
         var amount: Set<Int> = []
         
-        for i in 0..<indiciesOfFaceUpCards.count {
-            content.insert(activeCards[indiciesOfFaceUpCards[i]].data.content.type)
-            color.insert(activeCards[indiciesOfFaceUpCards[i]].data.color.type)
-            fill.insert(activeCards[indiciesOfFaceUpCards[i]].data.fill.type)
-            amount.insert(activeCards[indiciesOfFaceUpCards[i]].data.amount)
+        for i in 0..<indicesOfSelectedCards.count {
+            content.insert(activeCards[indicesOfSelectedCards[i]].data.content.type)
+            color.insert(activeCards[indicesOfSelectedCards[i]].data.color.type)
+            fill.insert(activeCards[indicesOfSelectedCards[i]].data.fill.type)
+            amount.insert(activeCards[indicesOfSelectedCards[i]].data.amount)
         }
         
         return (content.count == 1 || content.count == 3) &&
@@ -137,7 +151,7 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
     init(numberOfSetsOfCards: Int, contentFactory: (Int, Int, Int, Int) -> CardContent){
         self.cards = []
         self.activeCards = []
-        self.indiciesOfFaceUpCards = []
+        self.indicesOfSelectedCards = []
         var uId = 0
         for i in 0..<numberOfSetsOfCards {
             for j in 0..<numberOfSetsOfCards {
@@ -163,14 +177,15 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
             initCards()
         }
         
-        let tempArrayForTesting = Array(self.cards[0..<5])
-        self.cards = tempArrayForTesting
+//        let tempArrayForTesting = Array(self.cards[0..<5])
+//        self.cards = tempArrayForTesting
         
     }
     
     struct Card: Identifiable {
         var isSelected = false
-        var isPartOfSet = false
+        var isPartOfSetFoundByAI = false
+        var isMatched = false
         var data: CardContent
         var id: Int
         
