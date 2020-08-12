@@ -1,7 +1,8 @@
-#CS193P IOS APPLICATION DEVELOPMENTSPRING 2020. Assignment \#3
+# CS193P IOS APPLICATION DEVELOPMENT SPRING 2020. Assignment \#3
+
 ![](https://i.imgur.com/CEMAVRD.png)
 
-##<b>Required Tasks<b>:
+## <b>Required Tasks<b>:
 
 1.Implement a game of  solo (i.e. one player) Set. 
 
