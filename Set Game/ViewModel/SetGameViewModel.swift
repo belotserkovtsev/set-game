@@ -12,7 +12,7 @@ class SetGameViewModel: ObservableObject {
     @Published private var setGame: SetGame<CardContent>
     
     init() {
-        setGame = SetGameViewModel.createSetGame()
+        setGame = SetGame()
     }
     
     var activeCards: [SetGame<CardContent>.Card] {
@@ -35,13 +35,22 @@ class SetGameViewModel: ObservableObject {
     static func createSetGame() -> SetGame<CardContent> {
         SetGame(numberOfSetsOfCards: CardType.allCases.count) { (i, j, k, t) in
 //            print ( "\(CardType.allCases[i]); \(CardColor.allCases[j]); \(FillContent.allCases[k])" )
-            CardContent(content: CardType.allCases[i], color: CardColor.allCases[j], fill: CardFill.allCases[k], amount: t)
+            CardContent(
+                    content: CardType.allCases[i],
+                    color: CardColor.allCases[j],
+                    fill: CardFill.allCases[k],
+                    amount: t
+            )
 
 
         }
     }
     
     //MARK: Intents
+
+//    func fillModelWithCards() {
+//        newGame()
+//    }
     
     func choose(card: SetGame<CardContent>.Card) {
         if card.isSelected {

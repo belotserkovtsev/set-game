@@ -14,7 +14,7 @@ struct Diamond: Shape {
         let width = rect.width
         let height = rect.height
         
-        let length = min(width, height)/2
+        let length = min(height, width)/2
         
         let center = CGPoint(x: rect.midX, y: rect.midY)
         

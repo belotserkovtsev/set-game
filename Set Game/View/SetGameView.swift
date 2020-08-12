@@ -48,44 +48,47 @@ struct SetGameView: View {
                                         y: self.offsetCoordinateOutsideScreen
                                 )
                         )
-//                        .animation(.easeInOut(duration: 1))
             }
             
             NavigatorView(setGameViewModel: setGameViewModel)
                     .foregroundColor(.blue)
         }
                 .padding()
-        
+                .onAppear {
+                    withAnimation(Animation.easeInOut(duration: 1)) {
+                        self.setGameViewModel.newGame()
+                    }
+
+                }
+
     }
     
     private var offsetCoordinateOutsideScreen: CGFloat {
-        Array(arrayLiteral: CGFloat.random(in: -1000..<(-500)), CGFloat.random(in: 500..<1000))[Int.random(in: 0...1)]
+        [CGFloat.random(in: -1000..<(-500)), CGFloat.random(in: 500..<1000)].randomElement()!
     }
 }
 
 struct CardView: View {
     var card: SetGame<SetGameViewModel.CardContent>.Card
     @ObservedObject var setGameViewModel: SetGameViewModel
-//    @State var wrongAttempt = true
+    @State var wasOnceInMismatch = false
 
     var body: some View {
         
         Group {
             if card.data.content.type == 1 {
                 CapsuleView(card: card)
-            }
-            else if card.data.content.type == 2 {
+            } else if card.data.content.type == 2 {
                 RectangleView(card: card)
-            }
-            else if card.data.content.type == 3 {
+            } else if card.data.content.type == 3 {
                 DiamondView(card: card)
             }
         }
                 .padding()
                 .rotationEffect(.degrees(card.isMatched ? 360 : 0))
-                .cardify(thickness: card.isPartOfSetFoundByAI ? 10 : 3)
+                .cardify(thickness: card.isPartOfSetFoundByAI ? 8 : 3)
                 .padding(card.isSelected ? 8 : 0)
-//                .offset(x: card.isPartOfSetFoundByAI ? -10 : 0).animation(Animation.default.repeatCount(5))
+                .shake(data: !card.isMatched && setGameViewModel.selectedCardsCount == 3 && card.isSelected ? 1 : 0)
                 .foregroundColor(.blue)
     }
 }
@@ -96,7 +99,7 @@ struct NavigatorView: View {
         ZStack {
             RoundedRectangle(cornerRadius: 10)
                     .stroke()
-                    .frame(height: 80)
+                    .frame(height: 50)
             HStack {
                 Button(action: {
                     withAnimation(.easeInOut) {
@@ -108,7 +111,7 @@ struct NavigatorView: View {
 
                 Spacer()
 
-                Text("Score: \(setGameViewModel.score)").animation(.none)
+                Text("Score: \(setGameViewModel.score)").animation(.none).font(.title)
 
                 Spacer()
 
@@ -121,7 +124,7 @@ struct NavigatorView: View {
                 })
             }
                     .foregroundColor(.primary)
-                    .font(.title)
+                    .font(.headline)
                     .padding()
         }
     }

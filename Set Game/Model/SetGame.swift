@@ -16,7 +16,7 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
     private(set) var previousMadeSet = false
     
     mutating func select(_ card: Card) {
-//        print(card)
+
         if let i = activeCards.firstIndex(matching: card) {
             activeCards[i].isSelected = true
             indicesOfSelectedCards.append(i)
@@ -34,13 +34,17 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
             } else if indicesOfSelectedCards.count == 4 {
                 resetSelectedCards()
             }
+//            print(activeCards[i])
         }
+
     }
 
     mutating func deselect(_ card: Card) {
         if let i = activeCards.firstIndex(matching: card) {
             activeCards[i].isSelected = false
             indicesOfSelectedCards.removeAll{$0 == i}
+
+//            print(activeCards[i])
         }
     }
     
@@ -104,10 +108,9 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
                 }
 
             }
-        } else {
-            for i in 0..<activeCards.count {
-                activeCards[i].isSelected = false
-            }
+        }
+        indicesOfSelectedCards.forEach { i in
+            activeCards[i].isSelected = false
         }
         indicesOfSelectedCards = []
     }
@@ -180,6 +183,12 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
 //        let tempArrayForTesting = Array(self.cards[0..<5])
 //        self.cards = tempArrayForTesting
         
+    }
+
+    init() {
+        self.cards = []
+        self.activeCards = []
+        self.indicesOfSelectedCards = []
     }
     
     struct Card: Identifiable {
