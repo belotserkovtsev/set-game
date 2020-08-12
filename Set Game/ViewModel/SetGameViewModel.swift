@@ -30,6 +30,10 @@ class SetGameViewModel: ObservableObject {
     var selectedCardsCount: Int {
         setGame.indicesOfSelectedCards.count
     }
+
+    var selectedMakeSet: Bool {
+        setGame.lastSelectedCardsMadeSet
+    }
     
     
     static func createSetGame() -> SetGame<CardContent> {
@@ -47,14 +51,10 @@ class SetGameViewModel: ObservableObject {
     }
     
     //MARK: Intents
-
-//    func fillModelWithCards() {
-//        newGame()
-//    }
     
     func choose(card: SetGame<CardContent>.Card) {
         if card.isSelected {
-            if selectedCardsCount != 3 || !card.isMatched {
+            if selectedCardsCount != 3 {
                 setGame.deselect(card)
             }
         } else {
@@ -74,10 +74,6 @@ class SetGameViewModel: ObservableObject {
     func newGame() {
         setGame = SetGameViewModel.createSetGame()
     }
-    
-//    func playGame() {
-//        setGame.playGame()
-//    }
     
     struct CardContent: CardContentDeterminable {
         var content: CardType

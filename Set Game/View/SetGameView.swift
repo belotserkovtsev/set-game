@@ -10,6 +10,7 @@ import SwiftUI
 
 struct SetGameView: View {
     @ObservedObject var setGameViewModel: SetGameViewModel
+    @State var cardShakeSwitch = false
     var body: some View {
         VStack {
             HStack{
@@ -36,10 +37,16 @@ struct SetGameView: View {
 
             Grid(setGameViewModel.activeCards){ card in
                 CardView(card: card, setGameViewModel: self.setGameViewModel)
-                        .padding(5)
+                        .aspectRatio(3/4, contentMode: .fit)
+                        .padding(8)
+                        .shake(data: self.cardShakeSwitch ? 1 : 0)
                         .onTapGesture {
                             withAnimation(.easeInOut) {
                                 self.setGameViewModel.choose(card: card)
+                                if self.setGameViewModel.selectedCardsCount == 3 &&
+                                        !self.setGameViewModel.selectedMakeSet {
+                                    self.cardShakeSwitch = !self.cardShakeSwitch
+                                }
                             }
                         }
                         .transition(
@@ -71,10 +78,8 @@ struct SetGameView: View {
 struct CardView: View {
     var card: SetGame<SetGameViewModel.CardContent>.Card
     @ObservedObject var setGameViewModel: SetGameViewModel
-    @State var wasOnceInMismatch = false
 
     var body: some View {
-        
         Group {
             if card.data.content.type == 1 {
                 CapsuleView(card: card)
@@ -88,7 +93,6 @@ struct CardView: View {
                 .rotationEffect(.degrees(card.isMatched ? 360 : 0))
                 .cardify(thickness: card.isPartOfSetFoundByAI ? 8 : 3)
                 .padding(card.isSelected ? 8 : 0)
-                .shake(data: !card.isMatched && setGameViewModel.selectedCardsCount == 3 && card.isSelected ? 1 : 0)
                 .foregroundColor(.blue)
     }
 }

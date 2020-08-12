@@ -13,7 +13,7 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
     private(set) var activeCards: [Card]
     private(set) var score = 0
     private(set) var indicesOfSelectedCards: [Int]
-    private(set) var previousMadeSet = false
+    private(set) var lastSelectedCardsMadeSet = false
     
     mutating func select(_ card: Card) {
 
@@ -23,13 +23,13 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
 
             if indicesOfSelectedCards.count == 3 {
                 if selectedMakeSet() {
-                    previousMadeSet = true
+                    lastSelectedCardsMadeSet = true
                     indicesOfSelectedCards.forEach { i in
                         activeCards[i].isMatched = true
                     }
                     score += 20
                 } else {
-                    previousMadeSet = false
+                    lastSelectedCardsMadeSet = false
                 }
             } else if indicesOfSelectedCards.count == 4 {
                 resetSelectedCards()
@@ -94,10 +94,8 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
     }
 
     private mutating func resetSelectedCards() {
-        if previousMadeSet {
-            let lastIndex = indicesOfSelectedCards.popLast()!
-            activeCards[lastIndex].isSelected = false
-
+        let lastIndex = indicesOfSelectedCards.popLast()!
+        if lastSelectedCardsMadeSet {
             indicesOfSelectedCards.sort()
             for (_, elementIndex) in indicesOfSelectedCards.enumerated().reversed() {
                 if let e = cards.first {
@@ -112,7 +110,7 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
         indicesOfSelectedCards.forEach { i in
             activeCards[i].isSelected = false
         }
-        indicesOfSelectedCards = []
+        indicesOfSelectedCards = [lastIndex]
     }
     
     static func isSetPossible(with cards: [Card]) -> Bool {
@@ -131,7 +129,7 @@ struct SetGame<CardContent> where CardContent: CardContentDeterminable {
         return false
     }
     
-    private func selectedMakeSet() -> Bool {
+    func selectedMakeSet() -> Bool {
         
         var content: Set<Int> = []
         var color: Set<Int> = []

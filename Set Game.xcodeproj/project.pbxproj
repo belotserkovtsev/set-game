@@ -27,6 +27,7 @@
 
 /* Begin PBXFileReference section */
 		17D77AF340E17929CF24CC37 /* Shake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Shake.swift; sourceTree = "<group>"; };
+		17D77F670F19E5645911C7D6 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = readme.md; sourceTree = "<group>"; };
 		8411A84824D6019E009FC926 /* Set Game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Set Game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8411A84B24D6019E009FC926 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8411A84D24D6019E009FC926 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -62,6 +63,7 @@
 			children = (
 				8411A84A24D6019E009FC926 /* Set Game */,
 				8411A84924D6019E009FC926 /* Products */,
+				17D77F670F19E5645911C7D6 /* readme.md */,
 			);
 			sourceTree = "<group>";
 		};
